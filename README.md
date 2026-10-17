@@ -2,7 +2,13 @@
 
 Privacy-first web analytics. Add one script tag to your site and see visitors, page views, top pages, traffic sources and conversion funnels, without cookies, IP addresses or personal data.
 
-Live demo: https://pulse-analytics-pi.vercel.app (create an account, add a site and paste the snippet to start tracking)
+Live demo: https://pulse-analytics-pi.vercel.app/demo (public, read-only, sample data). To track your own site, sign in on the home page, add a site and paste the snippet.
+
+## Screenshots
+
+![Dashboard](docs/dashboard.png)
+
+![Funnel](docs/funnel.png)
 
 ## Features
 
@@ -11,6 +17,7 @@ Live demo: https://pulse-analytics-pi.vercel.app (create an account, add a site 
 - Cookieless tracking script for page views (including single-page-app route changes) and custom events through `pulse.track("name")`
 - Dashboard with visitors, page views, views per visitor, a per-day chart, and top pages, sources, countries, devices and browsers for 7, 30 or 90 days
 - Funnels: choose 2 to 5 steps (pages like `/pricing` or events like `event:signup_click`) and see how many visitors complete each step in order on the same day
+- Public read-only demo page at `/demo` that shows one sample site, so the dashboard can be explored without an account
 - Daily rollup tables keep the dashboard fast: about 2.5 s down to about 0.2 s on 500K seeded events
 - Visitors are counted with a daily-rotating hash, so no IP address or personal data is stored
 
@@ -40,7 +47,7 @@ Live demo: https://pulse-analytics-pi.vercel.app (create an account, add a site 
 - Privacy by design: the day is part of the visitor hash, so the same person gets a different hash tomorrow and cannot be followed across days.
 - Origin checks reject look-alike domains such as `shop.com.evil.com`. Localhost is allowed only outside production. This is covered by unit tests.
 - Idempotent rollups: the job recomputes the last two UTC days with upserts, so running it again is safe.
-- Ownership checks: every dashboard query filters by both site id and the signed-in user id, and the site id is validated as a UUID before it reaches the database.
+- Ownership checks: every dashboard query filters by both site id and the signed-in user id, and the site id is validated as a UUID before it reaches the database. The public `/demo` route can only ever show the one site named in the `DEMO_SITE_ID` setting, and it never exposes the site key or owner.
 - Protected cron endpoint: `/api/cron/rollup` only runs with the correct `Authorization: Bearer <CRON_SECRET>` header.
 - Measured performance: `scripts/bench.ts` times the same dashboard query on raw events and on the rollup tables. `scripts/seed-bulk.ts` fills the database with test events and `scripts/bench-funnel.ts` times funnels.
 - Tests: `tests/collect.test.ts` covers the visitor hash, the origin check and funnel step parsing.
@@ -53,7 +60,7 @@ Live demo: https://pulse-analytics-pi.vercel.app (create an account, add a site 
 | OPTIONS | /api/collect | no | CORS preflight |
 | GET | /api/cron/rollup | Bearer CRON_SECRET | Recompute the daily summary tables (`?days=1` to `60`) |
 
-Pages (all require sign-in): `/dashboard`, `/dashboard/:siteId`, `/dashboard/:siteId/funnel`.
+Pages: `/dashboard`, `/dashboard/:siteId` and `/dashboard/:siteId/funnel` require sign-in. `/demo` and `/demo/funnel` are public and read-only.
 
 ## Run locally
 
@@ -74,6 +81,7 @@ CLERK_SECRET_KEY=from the Clerk dashboard
 HASH_SECRET=any long random string
 CRON_SECRET=any long random string
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+DEMO_SITE_ID=optional, the id of one site to show on the public /demo page
 ```
 
 Create the tables and start the app:
@@ -90,6 +98,8 @@ npx tsx scripts/seed-demo.ts
 npx tsx scripts/rollup.ts
 ```
 
+To show that sample site on `/demo`, open it from your dashboard and copy the long id from the address bar (the part after `/dashboard/`) into `DEMO_SITE_ID`.
+
 Run the tests with `npm test`.
 
 ## Known limitations
@@ -98,6 +108,7 @@ Run the tests with `npm test`.
 - The rate limiter is in memory, so it applies per server instance and not globally. A shared store such as Redis would fix that.
 - The visitor hash changes daily, so a returning visitor counts once per day, and funnels only count steps completed on the same day.
 - Funnels scan raw events instead of pre-aggregated data, so they will slow down on very large datasets.
+- The public demo funnel page lets anyone run funnel queries on the sample site, and that page has no rate limit.
 - Sites can be added but not edited or deleted from the dashboard.
 - Country comes from a Vercel request header, so it is empty when running locally.
 - The performance numbers come from benchmarks on seeded data, not from real traffic.

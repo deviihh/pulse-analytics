@@ -47,7 +47,7 @@ export default async function Home() {
               Lightweight web analytics that counts visits without cookies, IP addresses or personal data.
               One script tag, one dashboard.
             </p>
-            <div className="mt-8 flex gap-3">
+            <div className="mt-8 flex flex-wrap gap-3">
               {userId ? (
                 <Button asChild size="lg">
                   <Link href="/dashboard">Open dashboard</Link>
@@ -57,6 +57,9 @@ export default async function Home() {
                   <Button size="lg">Get started</Button>
                 </SignInButton>
               )}
+              <Button asChild size="lg" variant="outline">
+                <Link href="/demo">View live demo</Link>
+              </Button>
               <Button asChild size="lg" variant="outline">
                 <a href="#how">How it works</a>
               </Button>
