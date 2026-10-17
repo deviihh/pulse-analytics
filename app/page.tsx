@@ -15,8 +15,8 @@ const features = [
     body: "Per-site keys, origin checks, payload validation, bot filtering and rate limiting on every event.",
   },
   {
-    title: "Fast at a million events",
-    body: "Composite index plus daily rollup tables: a 6.8 s dashboard now loads in about 0.2 s.",
+    title: "Fast at half a million events",
+    body: "Daily rollup tables: a 2.5 s dashboard now loads in about 0.2 s at 500K events.",
   },
   {
     title: "Funnels and custom events",
