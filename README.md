@@ -2,7 +2,7 @@
 
 Privacy-first web analytics. Add one script tag to your site and see visitors, page views, top pages, traffic sources and conversion funnels, without cookies, IP addresses or personal data.
 
-Live demo: https://pulse-analytics-pi.vercel.app (sign in to open a demo site with sample data)
+Live demo: https://pulse-analytics-pi.vercel.app (create an account, add a site and paste the snippet to start tracking)
 
 ## Features
 
